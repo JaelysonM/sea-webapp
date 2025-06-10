@@ -1,0 +1,34 @@
+.customDashboardTabs {
+  width: fit-content;
+  border: none !important;
+}
+
+.tabLink {
+  composes: nav-link from global;
+  border: none !important;
+  border-bottom: 1.5px solid transparent !important;
+  color: var(--bs-secondary) !important;
+  font-weight: normal !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: calc(0.5rem - 3px) !important;
+  margin-right: 1rem;
+  text-align: center;
+  transition: opacity 0.8s ease !important;
+  text-decoration: none !important;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    opacity: 0.5;
+    text-decoration: none !important;
+  }
+}
+
+.activeTabLink {
+  color: var(--bs-primary) !important;
+  font-weight: normal !important;
+  border-bottom-color: var(--bs-primary) !important;
+  background-color: transparent !important;
+}

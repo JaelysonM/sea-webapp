@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" class="theme-light">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SIASD - App</title>
+    <style>
+      html,
+      body,
+      body > div#root {
+        min-height: 100vh;
+        max-height: 100vh;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      body > div#root {
+        display: flex;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <div id="modal"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>

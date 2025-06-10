@@ -1,0 +1,30 @@
+name: Health Check CI Workflow
+
+on:
+  pull_request:
+    branches: [master, develop]
+
+jobs:
+  code:
+    name: Run type checking and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js ⚙️
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.20'
+
+      - name: Install dependencies 📦
+        run: npm install --force
+
+      - name: Run type checking 🛂
+        run: npm run tsc
+
+      - name: Run unit linting 🕵️
+        run: npm run lint
+
+      - name: Run unit tests 🧪
+        run: npm run test

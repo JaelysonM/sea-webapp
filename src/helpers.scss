@@ -1,0 +1,118 @@
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin fill-parent($width: 0, $height: 0) {
+  min-width: 0;
+  min-height: 0;
+
+  @if $width !=0 {
+    width: $width;
+  }
+
+  @if $height !=0 {
+    height: $height;
+  }
+}
+
+@mixin fill-parent-all {
+  @include fill-parent(100%, 100%);
+}
+
+@mixin fill-parent-width {
+  @include fill-parent($width: 100%);
+}
+
+@mixin fill-parent-height {
+  @include fill-parent($height: 100%);
+}
+
+@mixin break-word {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  word-break: break-all;
+  word-break: break-word;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@mixin label-styles {
+  label {
+    font-family: $content;
+    font-size: #{$text-content-sm}px;
+    line-height: $text-line-heights-sm;
+    font-weight: $text-weight-semi-bold;
+    color: $neutral-800;
+  }
+}
+
+@mixin tippy-popup($color: $neutral-10, $background: $neutral-800) {
+  .popup {
+    font-family: $content !important;
+    font-size: #{$text-content-sm}px !important;
+    font-weight: 500 !important;
+    line-height: $text-line-heights-sm !important;
+    color: $color !important;
+    background-color: $background !important;
+    box-shadow: 0px 20px 27px rgba(0, 0, 0, 0.05);
+  }
+}
+
+@mixin default-page-styles {
+  .container {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+
+    span {
+      font-family: $content;
+      font-size: #{$text-content-sm}px;
+      line-height: $text-line-heights-sm;
+      font-weight: $text-weight-normal;
+      color: $neutral-600;
+    }
+
+    h1 {
+      line-height: $text-line-heights-h4;
+      font-family: $title;
+      margin: 0;
+      text-align: flex-start;
+      font-size: #{$text-title-h4}px;
+    }
+
+    .loader {
+      @include flex-center;
+      width: 100%;
+    }
+
+    .centerChip {
+      @include flex-center;
+    }
+  }
+}

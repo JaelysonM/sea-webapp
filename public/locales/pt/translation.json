@@ -1,0 +1,25 @@
+{
+  "brandName": "SIASD",
+  "pages": {
+    "notFound": {
+      "title": "404",
+      "subtitle": "Oops! Page \nNot Found.",
+      "content": "This error usually happens when the URL is misspelled, copied/pasted incorrectly, or the page no longer exists."
+    },
+    "login": {
+      "sucessLogin": "Login realizado com sucesso",
+      "form": {
+        "email": "E-mail",
+        "emailPlaceholder": "Insira seu e-mail aqui",
+        "password": "Senha",
+        "passwordPlaceholder": "Insira sua senha aqui",
+        "submit": "Entrar",
+        "continue": "Continuar",
+        "rememberPassword": "Lembrar senha",
+        "forgetPassword": "Esqueci a senha",
+        "backToLogin": "Voltar",
+        "resetPassword": "Insira o seu e-mail para receber as instruções de redefinição de sua senha."
+      }
+    }
+  }
+}
