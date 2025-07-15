@@ -6,6 +6,7 @@ export { default as useFirstRender } from './useFirstRender';
 export { default as useFormSelect } from './useFormSelect';
 export { default as useImageLoader } from './useImageLoader';
 export { default as useInfiniteQuery } from './useInfinityList';
+export { default as useInfinityList } from './useInfinityList';
 export { default as useList } from './useList';
 export { default as useMediaQuery } from './useMediaQuery';
 export { default as useModal } from './useModal';

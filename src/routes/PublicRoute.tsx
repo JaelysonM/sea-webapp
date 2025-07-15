@@ -5,10 +5,10 @@ import { Loading } from 'pages/shared';
 import { isAuthenticated, useAuthState } from 'store/auth';
 
 const PublicRoute = ({ ...rest }) => {
-  const { userId } = useAuthState();
+  const { access_token } = useAuthState();
   const authenticated = useSelector(isAuthenticated);
 
-  if (!authenticated && userId) {
+  if (!authenticated && access_token) {
     return <Loading />;
   }
 

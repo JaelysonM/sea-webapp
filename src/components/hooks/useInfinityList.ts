@@ -29,7 +29,11 @@ const useList = <T>({ baseUrl }: Props) => {
     return useInfiniteQuery<T>({
       queryKey: [baseUrl],
       queryFn: ({ pageParam = 1 }) => queryFn({ currentPage: pageParam as number }),
-      getNextPageParam: (lastPage) => (lastPage as Pageable<T>).options.page + 1,
+      getNextPageParam: (lastPage) => {
+        const options = (lastPage as Pageable<T>).options;
+        const nextPage = options.page + 1;
+        return nextPage <= options.pages ? nextPage : undefined;
+      },
       initialPageParam: 1,
       placeholderData: keepPreviousData,
       staleTime: Infinity,
@@ -37,7 +41,7 @@ const useList = <T>({ baseUrl }: Props) => {
   };
 
   const {
-    data: inifinteQueryList,
+    data: infiniteQueryList,
     refetch,
     fetchNextPage,
     isLoading,
@@ -45,7 +49,7 @@ const useList = <T>({ baseUrl }: Props) => {
   } = useListQuery<Pageable<T>>();
 
   const paginatedData = [] as T[];
-  inifinteQueryList?.pages.forEach((page) => {
+  infiniteQueryList?.pages.forEach((page) => {
     page.data.forEach((char) => {
       paginatedData.push(char);
     });

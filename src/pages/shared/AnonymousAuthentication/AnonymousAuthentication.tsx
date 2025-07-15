@@ -1,32 +1,35 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
+import { Loading } from 'pages/shared';
+import { useAppDispatch } from 'store';
 import { isAuthenticated, login } from 'store/auth';
 
 import { useQueryParams } from 'components/hooks';
 
 const AnonymousAuthentication: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const authenticated = useSelector(isAuthenticated);
-
-  const redirectTo = '/';
 
   const { get } = useQueryParams();
 
-  const redirectUrl = get.redirectUrl ? String(get.redirectUrl) : redirectTo;
-  const loggedInUserId = get.userId ? Number(get.userId) : undefined;
+  const loggedInToken = get.token ? String(get.token) : '';
 
   useEffect(() => {
-    if (loggedInUserId && !authenticated) {
-      dispatch(login({ userId: loggedInUserId }));
+    if (loggedInToken && !authenticated) {
+      dispatch(
+        login({
+          token: loggedInToken,
+        }),
+      );
     }
-  }, [authenticated, loggedInUserId, dispatch]);
+  }, [authenticated, loggedInToken, dispatch]);
 
-  if (authenticated) {
-    return <Navigate to={redirectUrl} replace />;
+  if (!authenticated) {
+    return <Loading />;
   }
 
-  return <Navigate to='/' replace state={{ from: redirectUrl }} />;
+  return <Navigate to='/' replace />;
 };
 
 export default AnonymousAuthentication;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Col, Image, Row, Spinner } from 'react-bootstrap';
+import { Badge, Card, Col, Image, Row, Spinner } from 'react-bootstrap';
 
 import { useImageLoader } from 'components/hooks';
 
@@ -10,6 +10,10 @@ interface Props {
   carbValue: number;
   fatValue: number;
   className?: string;
+  tag?: {
+    text: string;
+    variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+  };
 }
 
 const FoodCard: React.FC<Props> = ({
@@ -18,7 +22,7 @@ const FoodCard: React.FC<Props> = ({
   proteinValue,
   carbValue,
   fatValue,
-
+  tag,
   className = '',
 }) => {
   const imageStatus = useImageLoader(imageUrl);
@@ -38,22 +42,30 @@ const FoodCard: React.FC<Props> = ({
               <Image
                 src={imageUrl}
                 fluid
+                rounded
                 className='w-100'
-                style={{ objectFit: 'cover', height: '100%' }}
+                style={{ objectFit: 'cover', height: '100%', pointerEvents: 'none' }}
               />
             )}
           </Col>
           <Col xs={7} className='d-flex flex-column justify-content-center p-3 m-0'>
-            <h2 className='fw-bold' style={{ fontSize: '2rem' }}>
-              {title}
-            </h2>
+            <div className='d-flex align-items-center mb-3'>
+              <h2 className='fw-bold m-0' style={{ fontSize: '2rem' }}>
+                {title}
+              </h2>
+              {tag && (
+                <Badge bg={tag.variant} className='ms-3 fs-6 lh-1'>
+                  {tag.text}
+                </Badge>
+              )}
+            </div>
             <div className='d-flex flex-column'>
               <div className='d-flex align-items-center'>
                 <div style={{ fontSize: '1.5rem' }}>
                   <i className='bi bi-egg' style={{ color: 'var(--bs-danger)' }}></i>
                 </div>
                 <span className='fw-bold ps-2' style={{ fontSize: '1rem', minWidth: '80px' }}>
-                  {proteinValue}g/kg
+                  {proteinValue}g/100g
                 </span>
                 <span className='text-secondary' style={{ fontSize: '1rem' }}>
                   Proteínas
@@ -67,7 +79,7 @@ const FoodCard: React.FC<Props> = ({
                   ></i>
                 </div>
                 <span className='fw-bold ps-2' style={{ fontSize: '1rem', minWidth: '80px' }}>
-                  {carbValue}g/kg
+                  {carbValue}g/100g
                 </span>
                 <span className='text-secondary' style={{ fontSize: '1rem' }}>
                   Carboidratos
@@ -78,7 +90,7 @@ const FoodCard: React.FC<Props> = ({
                   <i className='bi bi-droplet-half' style={{ color: 'var(--bs-warning)' }}></i>
                 </div>
                 <span className='fw-bold ps-2' style={{ fontSize: '1rem', minWidth: '80px' }}>
-                  {fatValue}g/kg
+                  {fatValue}g/100g
                 </span>
                 <span className='text-secondary' style={{ fontSize: '1rem' }}>
                   Gorduras

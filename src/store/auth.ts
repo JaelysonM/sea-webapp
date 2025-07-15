@@ -1,32 +1,71 @@
 import { useSelector } from 'react-redux';
-import { createAction, createAsyncThunk, createReducer } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createReducer, Middleware } from '@reduxjs/toolkit';
 import { api } from 'apis';
+import { AxiosError } from 'axios';
+import jwt from 'jwt-decode';
 import { RootState } from 'store';
 
 export type AuthState = {
-  userId?: number;
+  user_id?: number;
+  access_token?: string;
+  refresh_token?: string | null;
   status: 'unauthenticated' | 'authenticated';
   userData?: UserData;
 };
 
-export type UserData = {
-  id: number;
+type AuthenticationResponse = {
+  access_token: string;
+  refresh_token: string;
+};
+
+type Group = {
+  id?: number;
   name: string;
 };
 
-type AnonymousLogin = {
-  userId: number;
+export type UserData = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  is_active: boolean;
+  is_super_user: boolean;
+  created_at: string;
+  updated_at: string;
+  last_login: string;
+  permissions: [];
+  groups: Group[];
+};
+
+type FastAuth = {
+  token: string;
 };
 
 export const logout = createAction('LOGOUT');
 
-export const login = createAction<AnonymousLogin>('LOGIN');
+export const login = createAsyncThunk('LOGIN', async (data: FastAuth, { rejectWithValue }) => {
+  try {
+    const request = await api.post<AuthenticationResponse>('qrcode/authenticate', data);
+    return request.data;
+  } catch (error) {
+    return rejectWithValue((error as AxiosError).response?.data);
+  }
+});
+
+export const refreshToken = createAsyncThunk(
+  'REFRESH_TOKEN',
+  async (): Promise<AuthenticationResponse> => {
+    const refresh_token = localStorage.getItem('@sea/refresh');
+    return (
+      await api.post('/auth/refresh', {
+        refresh_token,
+      })
+    ).data;
+  },
+);
 
 export const fetchUserData = createAsyncThunk('FETCH_USER_DATA', async () => {
-  return {
-    id: 1, // Placeholder for user ID
-    name: 'John Doe', // Placeholder for user name
-  } as UserData; // Simulated user data, replace with actual API call if needed
+  return (await api.get('/auth/me')).data;
 });
 
 const buildInitialState = (): AuthState => ({
@@ -36,13 +75,18 @@ const buildInitialState = (): AuthState => ({
 const initialState = buildInitialState();
 
 try {
-  const anonymousUserId = localStorage.getItem('@sea/anonymousUser');
+  const refresh = localStorage.getItem('@sea/refresh');
+  const access = localStorage.getItem('@sea/access');
 
-  if (typeof anonymousUserId === 'string') {
-    initialState.userId = Number(anonymousUserId);
+  if (typeof access === 'string') {
+    const { user_id } = jwt(access) satisfies AuthState;
+
+    initialState.user_id = user_id;
+    initialState.access_token = access;
+    initialState.refresh_token = refresh;
     initialState.status = 'authenticated';
 
-    api.defaults.headers.common['User-Id'] = String(initialState.userId);
+    api.defaults.headers.common.Authorization = `Bearer ${access}`;
   }
 } catch (_err) {
   // Ignore
@@ -51,17 +95,77 @@ try {
 const selector = (state: RootState) => state.auth;
 export const useAuthState = () => useSelector(selector);
 
+export const isUserDataLoaded = (state: RootState) => !!state.auth.userData;
+
 export const isAuthenticated = (state: RootState) => state.auth.status === 'authenticated';
+export const isAdmin = (state: RootState) => {
+  const userData = state.auth.userData;
 
-const setTokens = (userId?: number): AuthState => {
-  if (userId) {
-    api.defaults.headers.common['User-Id'] = String(userId);
+  if (userData?.is_super_user) return true;
+  if (userData?.groups) {
+    return userData.groups.some((group) => group.id === 1);
+  }
+  return false;
+};
+export const isUser = (state: RootState) => {
+  const userData = state.auth.userData;
 
-    localStorage.setItem('@sea/anonymousUser', String(userId));
+  if (userData?.is_super_user) return false;
 
+  return true;
+};
+
+const actionTypes = [
+  login.fulfilled.type,
+  login.rejected.type,
+  refreshToken.fulfilled.type,
+  refreshToken.rejected.type,
+  fetchUserData.fulfilled.type,
+  fetchUserData.rejected.type,
+];
+
+export const persistor: Middleware = (store) => (next) => (action) => {
+  const result = next(action);
+  if (actionTypes.includes(result.type)) {
+    const { access_token, refresh_token } = store.getState().auth;
+
+    const accessConditions = {
+      true: () => {
+        localStorage.setItem('@sea/access', access_token);
+        api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+      },
+      false: () => {
+        localStorage.removeItem('@sea/access');
+        delete api.defaults.headers.common.Authorization;
+      },
+    };
+
+    const refreshConditions = {
+      true: () => {
+        localStorage.setItem('@sea/refresh', refresh_token);
+      },
+      false: () => {
+        localStorage.removeItem('@sea/refresh');
+      },
+    };
+
+    accessConditions[String(!!access_token) as keyof typeof accessConditions]();
+    refreshConditions[String(!!refresh_token) as keyof typeof refreshConditions]();
+  }
+
+  return result;
+};
+
+const setTokens = (state: AuthState, res: AuthenticationResponse): AuthState => {
+  const { access_token, refresh_token } = res;
+  if (access_token) {
+    api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
     try {
+      const { user_id } = jwt(access_token) satisfies AuthState;
       return {
-        userId,
+        user_id,
+        access_token,
+        refresh_token: refresh_token || state.refresh_token,
         status: 'authenticated',
       };
     } catch (_err) {
@@ -73,14 +177,16 @@ const setTokens = (userId?: number): AuthState => {
 };
 
 const removeTokens = () => {
-  localStorage.removeItem('@sea/anonymousUser');
-  delete api.defaults.headers.common['User-Id'];
+  localStorage.removeItem('@sea/access');
+  localStorage.removeItem('@sea/refresh');
+  delete api.defaults.headers.common.Authorization;
   return buildInitialState();
 };
 
 export default createReducer(initialState, (builder) => {
   builder
-    .addCase(login, (_, action) => setTokens(action.payload.userId))
+    .addCase(login.rejected, () => buildInitialState())
+    .addCase(login.fulfilled, (state: AuthState, action) => setTokens(state, action.payload))
     .addCase(fetchUserData.rejected, () => buildInitialState())
     .addCase(fetchUserData.fulfilled, (state: AuthState, action) => {
       return {
@@ -88,5 +194,9 @@ export default createReducer(initialState, (builder) => {
         userData: action.payload,
       };
     })
-    .addCase(logout, () => removeTokens());
+    .addCase(logout, () => removeTokens())
+    .addCase(refreshToken.rejected, () => buildInitialState())
+    .addCase(refreshToken.fulfilled, (state: AuthState, action) =>
+      setTokens(state, action.payload),
+    );
 });

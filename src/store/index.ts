@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-import auth from './auth';
+import auth, { persistor } from './auth';
 import message from './message';
 import stores from './stores';
 
@@ -11,7 +11,8 @@ export type RootState = ReturnType<typeof rootReducer>;
 
 const store = configureStore({
   reducer: rootReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(persistor),
   devTools: process.env.NODE_ENV !== 'production',
 });
 

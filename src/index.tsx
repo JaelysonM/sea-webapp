@@ -5,7 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { api } from 'apis';
 import { queryClient } from 'apis/queryClient';
 import store from 'store';
-import { logout } from 'store/auth';
+import { fetchUserData, logout, refreshToken } from 'store/auth';
 
 import App from './App';
 
@@ -37,7 +37,17 @@ api.interceptors.response.use(
           firstTry = false;
         }
       });
-      if (!store.getState().auth.userId) return;
+      if (!store.getState().auth.access_token) return;
+
+      store
+        .dispatch(refreshToken())
+        .then(() => {
+          api.defaults.headers.common['Authorization'] = `Bearer ${
+            store.getState().auth.access_token
+          }`;
+          store.dispatch(fetchUserData());
+        })
+        .catch(kickUser);
     }
 
     return Promise.reject(err);
