@@ -110,12 +110,12 @@ const NutrientStatCard: React.FC<NutrientStatCardProps> = ({
       style={{ borderRadius: '0.60rem' }}
     >
       <Card.Body style={{ padding: '1.3rem' }}>
-        <div className='text-secondary mb-2' style={{ fontSize: '0.85rem', fontWeight: 500 }}>
+        <div className='text-secondary mb-2' style={{ fontSize: '0.75rem', fontWeight: 500 }}>
           {label}
         </div>
         <AnimatedDonutChart
           percentage={animatedPercentage}
-          size={70}
+          size={60}
           strokeWidth={9}
           color={color}
           iconClassName={iconClassName}

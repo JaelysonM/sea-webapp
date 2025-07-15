@@ -15,6 +15,8 @@ import ProcessingLoader from './ProcessingLoader';
 import useCurrentMeal from './useCurrentMeal';
 import useInitializeMeal from './useInitializeMeal';
 
+import styles from './Plate.module.scss';
+
 const Plate: React.FC = () => {
   const { width } = useWindowSize();
   const { processedMeal, isLoading, error, refetch } = useCurrentMeal();
@@ -22,30 +24,19 @@ const Plate: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleQRScan = async (result: string) => {
-    console.log('QR Code escaneado:', result);
     setIsProcessing(true);
 
     try {
       const response = await initializeMeal({ plate_identifier: result });
 
       if (response) {
-        console.log('Refeição inicializada com sucesso:', response);
-        // Aguardar um momento para garantir que os dados estejam processados no backend
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        // Recarregar os dados da refeição
         await refetch();
       }
     } catch (err) {
       console.error('Erro ao inicializar refeição:', err);
     } finally {
       setIsProcessing(false);
-    }
-  };
-
-  const handleQRError = (error: Error) => {
-    // Só loggar erros que não sejam NotFoundException ou ChecksumException
-    if (error.name !== 'NotFoundException' && error.name !== 'ChecksumException') {
-      console.error('Erro ao escanear QR Code:', error);
     }
   };
 
@@ -88,17 +79,22 @@ const Plate: React.FC = () => {
   if (error) {
     return (
       <div style={{ opacity: 1, transition: 'opacity 0.3s ease-in-out' }}>
-        <QRCodeScanner onScan={handleQRScan} onError={handleQRError} />
+        <QRCodeScanner onScan={handleQRScan} />
       </div>
     );
   }
 
   return (
     <Container
-      className='p-0 gap-3 d-flex flex-column align-items-center card-fade-in'
-      style={{ opacity: 1, transition: 'opacity 0.3s ease-in-out' }}
+      className={`p-0 gap-3 d-flex flex-column align-items-center card-fade-in ${styles.plateContainer}`}
+      style={{
+        opacity: 1,
+        transition: 'opacity 0.3s ease-in-out',
+        paddingBottom: '2rem',
+      }}
     >
       <div
+        className={styles.plateWrapper}
         style={{
           position: 'relative',
           width: '100%',
@@ -124,9 +120,13 @@ const Plate: React.FC = () => {
         />
       </div>
 
-      <CalorieDisplayCard title='Calorias do seu prato' calories={Math.round(animatedCalories)} />
+      <CalorieDisplayCard
+        title='Calorias do seu prato'
+        calories={Math.round(animatedCalories)}
+        className={styles.calorieCard}
+      />
       <Container
-        className='d-flex p-0 justify-content-between'
+        className={`d-flex p-0 justify-content-between ${styles.nutrientCards}`}
         style={{ maxWidth: 450, width: '100%' }}
       >
         <NutrientStatCard

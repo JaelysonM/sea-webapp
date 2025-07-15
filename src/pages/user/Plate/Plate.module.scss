@@ -1,0 +1,69 @@
+/* Estilos específicos para mobile na tela de Plate */
+
+/* Container principal da tela de Plate */
+.plateContainer {
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    padding-bottom: 3rem !important;
+    gap: 1.5rem !important;
+    overflow: visible !important;
+  }
+
+  @media (max-width: 480px) {
+    padding-bottom: 4rem !important;
+    gap: 1rem !important;
+  }
+}
+
+/* Wrapper da imagem do prato */
+.plateWrapper {
+  max-width: 100%;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Classe utilitária para scroll suave em mobile */
+.mobileScrollContainer {
+  @media (max-width: 768px) {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Ajustes para dispositivos com altura limitada */
+@media (max-height: 600px) and (orientation: landscape) {
+  .plateContainer {
+    padding-bottom: 1rem !important;
+    min-height: auto !important;
+  }
+}
+
+/* Estilos adicionais para melhorar a experiência mobile */
+
+/* Garante que os containers de nutrientes não sejam cortados */
+.nutrientCards {
+  @media (max-width: 768px) {
+    gap: 0.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Ajustes para o card de calorias */
+.calorieCard {
+  @media (max-width: 768px) {
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Melhorias para o iOS Safari */
+@supports (-webkit-appearance: none) {
+  .plateContainer {
+    @media (max-width: 768px) {
+      /* Adiciona espaço extra para o iOS Safari */
+      padding-bottom: calc(2rem + env(safe-area-inset-bottom)) !important;
+    }
+  }
+}

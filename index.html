@@ -15,15 +15,14 @@
       body,
       body > div#root {
         min-height: 100vh;
-        max-height: 100vh;
-        height: 100vh;
         margin: 0;
         padding: 0;
-        overflow: hidden;
+        /* Removido max-height e overflow: hidden para permitir scroll em mobile */
       }
 
       body > div#root {
         display: flex;
+        flex-direction: column;
       }
     </style>
   </head>

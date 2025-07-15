@@ -9,9 +9,9 @@ const UserLayout: React.FC = () => {
   const { userData } = useAuthState();
 
   return (
-    <Container className='d-flex flex-column vh-100 p-4 overflow-auto flex-grow-1 m-0' fluid>
+    <Container className='d-flex flex-column min-vh-100 p-4 flex-grow-1 m-0' fluid>
       <TopBar userName={userData?.first_name} homePath='/user' />
-      <Container fluid className='p-0 flex-grow-1 mt-4'>
+      <Container fluid className='p-0 flex-grow-1 mt-4' style={{ paddingBottom: '2rem' }}>
         <Outlet />
       </Container>
     </Container>

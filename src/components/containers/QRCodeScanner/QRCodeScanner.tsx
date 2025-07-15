@@ -21,16 +21,20 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
 
   const checkCameraPermission = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // Configuração melhorada para mobile
+      const constraints = {
         video: {
-          facingMode: 'environment',
-          width: { ideal: 640 },
-          height: { ideal: 480 },
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280, max: 1920 },
+          height: { ideal: 720, max: 1080 },
         },
-      });
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       stream.getTracks().forEach((track) => track.stop());
       setHasPermission(true);
     } catch (error) {
+      console.error('Erro ao verificar permissão da câmera:', error);
       setHasPermission(false);
     } finally {
       setIsLoading(false);
@@ -40,16 +44,20 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
   const requestPermission = useCallback(async () => {
     setIsLoading(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      // Configuração melhorada para mobile
+      const constraints = {
         video: {
-          facingMode: 'environment',
-          width: { ideal: 640 },
-          height: { ideal: 480 },
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280, max: 1920 },
+          height: { ideal: 720, max: 1080 },
         },
-      });
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       stream.getTracks().forEach((track) => track.stop());
       setHasPermission(true);
     } catch (error) {
+      console.error('Erro ao solicitar permissão da câmera:', error);
       setHasPermission(false);
       if (onError) {
         onError(error as Error);
@@ -77,6 +85,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
         if (result && scanningRef.current && now - lastScanTime.current > 1000) {
           lastScanTime.current = now;
           const qrContent = result.getText();
+          console.log('QR Code detectado:', qrContent);
           showToastMessage(`QR Code: ${qrContent}`);
           onScan(qrContent);
         }
@@ -89,12 +98,14 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
           error.name !== 'FormatException' &&
           scanningRef.current
         ) {
+          console.error('Erro no scanning:', error);
           if (onError) {
             onError(error as Error);
           }
         }
       });
     } catch (error) {
+      console.error('Erro ao iniciar scanning:', error);
       if (scanningRef.current && onError) {
         onError(error as Error);
       }
@@ -182,7 +193,8 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
 
               <small className='text-muted mt-2'>
                 <i className='bi bi-info-circle me-1'></i>
-                Clique em &quot;Permitir&quot; quando o navegador solicitar a permissão
+                <strong>Mobile:</strong> Clique em &quot;Permitir&quot; quando o navegador solicitar
+                a permissão da câmera
               </small>
             </div>
           </div>

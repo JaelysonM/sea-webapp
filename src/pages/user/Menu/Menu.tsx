@@ -54,16 +54,17 @@ const Menu: React.FC = () => {
   }
 
   return (
-    <div className='d-flex flex-column overflow-auto gap-3 card-fade-in'>
+    <div className='d-flex flex-column overflow-auto gap-2 gap-sm-3 card-fade-in px-1 px-sm-0'>
       {menuItems.map((item) => (
-        <FoodCard
-          key={item.id}
-          title={item.name}
-          imageUrl={item.photo}
-          proteinValue={item.protein}
-          carbValue={item.carbs}
-          fatValue={item.fat}
-        />
+        <div key={item.id} className='w-100' style={{ maxWidth: '100%' }}>
+          <FoodCard
+            title={item.name}
+            imageUrl={item.photo}
+            proteinValue={item.protein}
+            carbValue={item.carbs}
+            fatValue={item.fat}
+          />
+        </div>
       ))}
     </div>
   );

@@ -5,6 +5,7 @@ export const API_DEFAULT_HEADERS = {
   'Content-Type': 'application/json',
   Accept: 'application/json',
   'Access-Control-Allow-Origin': '*',
+  'ngrok-skip-browser-warning': 'true',
 };
 
 export const SUCCESS_DURATION = 1000;

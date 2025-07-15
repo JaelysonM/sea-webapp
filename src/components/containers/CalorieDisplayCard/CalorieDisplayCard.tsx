@@ -30,7 +30,7 @@ const CalorieDisplayCard: React.FC<Props> = ({
       style={{ borderRadius: '0.60rem', maxWidth: 450, width: '100%' }}
     >
       <Card.Body style={{ padding: '1.3rem' }}>
-        <h3 className='text-secondary' style={{ fontSize: '1rem' }}>
+        <h3 className='text-secondary' style={{ fontSize: '0.9rem' }}>
           {title}
         </h3>
         <Container
@@ -39,15 +39,15 @@ const CalorieDisplayCard: React.FC<Props> = ({
         >
           <span
             className='text-warning me-2'
-            style={{ fontSize: '2rem', lineHeight: '1' }}
+            style={{ fontSize: '1.8rem', lineHeight: '1' }}
             aria-hidden='true'
           >
             <i className='bi bi-fire' />
           </span>
-          <h2 className='text-dark fw-bolder m-0' style={{ fontSize: '5rem', lineHeight: '1' }}>
+          <h2 className='text-dark fw-bolder m-0' style={{ fontSize: '4.5rem', lineHeight: '1' }}>
             {formattedDisplayCalories}
           </h2>
-          <h3 className='text-dark fw-normal m-0' style={{ fontSize: '1.5rem' }}>
+          <h3 className='text-dark fw-normal m-0' style={{ fontSize: '1.2rem' }}>
             {unit}
           </h3>
         </Container>

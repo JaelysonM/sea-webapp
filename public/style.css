@@ -1,17 +1,14 @@
 html,
 body {
-  height: 100vh;
+  min-height: 100vh;
   width: 100vw;
   padding: 0;
   margin: 0;
-  overflow: hidden;
+  /* Removido overflow: hidden para permitir scroll em mobile */
 }
 
 body {
-  --footer-height: 24px;
-  display: grid;
-  grid: calc(100vh - var(--footer-height)) var(--footer-height) / 100vw;
-  font-family: "Lato";
+  font-family: 'Lato';
 }
 
 main {
@@ -48,7 +45,7 @@ img {
 
 /*######### SIDE BAR STYLE #########*/
 #sideBarPanel {
-  background-color: #A0B9D0;
+  background-color: #a0b9d0;
 }
 
 .sideBarHeaderPanel {
@@ -56,7 +53,7 @@ img {
   flex-direction: column;
   width: 300px;
   height: 144px;
-  background-color: #A0B9D0;
+  background-color: #a0b9d0;
 }
 
 .sideBarTopHeaderImg {
@@ -67,7 +64,7 @@ img {
   flex: none;
   order: 0px;
   flex-grow: 0px;
-  background-color: #A0B9D0;
+  background-color: #a0b9d0;
 }
 
 .sideBarAppTitlePanel {
@@ -77,13 +74,13 @@ img {
   width: 300px;
   height: 64px;
   top: 80px;
-  background-color: #A0B9D0;
+  background-color: #a0b9d0;
 }
 
 .sideBarLImg {
   width: 64px;
   height: 64px;
-  background-color: #A0B9D0;
+  background-color: #a0b9d0;
 }
 
 .l1 {
@@ -97,10 +94,9 @@ img {
 .sideBarNuvenTitlePanel {
   position: absolute;
   left: 64px;
-  background-color: #A0B9D0;
+  background-color: #a0b9d0;
   height: 64px;
   width: 236px;
-  
 }
 
 .companyName {
@@ -250,7 +246,7 @@ a:hover {
 #guideHeaderPanel {
   position: relative;
   height: 400px;
-  background-color: #A0B9D0;
+  background-color: #a0b9d0;
 }
 
 #NuvenBanner {
@@ -274,7 +270,7 @@ a:hover {
   width: 95.97px;
   height: 95.97px;
   top: 10.04px;
-  background: #94AEE3;
+  background: #94aee3;
 }
 
 .l2 {
@@ -448,7 +444,7 @@ td {
 
 .footerText {
   color: #5c5c5c;
-  font-family: "Lato";
+  font-family: 'Lato';
   font-size: 12px;
   font-weight: 400;
   line-height: 16px;
