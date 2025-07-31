@@ -31,6 +31,11 @@ const Dashboard: React.FC = () => {
             Menu
           </NavLink>
         </Nav.Item>
+        <Nav.Item>
+          <NavLink to='history' className={getLinkClassName}>
+            Histórico
+          </NavLink>
+        </Nav.Item>
       </Nav>
       <div>
         <Outlet />

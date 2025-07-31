@@ -1,0 +1,81 @@
+/* Estilos específicos para a tela de histórico */
+
+/* Container principal do histórico */
+.historyContainer {
+  padding-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    padding-bottom: 3rem;
+  }
+}
+
+/* Cards de refeição */
+.mealCard {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Garante que todas as colunas de resumo tenham a mesma altura */
+  .row.g-2 {
+    display: flex;
+    align-items: stretch;
+
+    .col-4 {
+      display: flex;
+
+      > div {
+        width: 100%;
+        min-height: 80px;
+      }
+    }
+  }
+}
+
+/* Ajustes para mobile */
+@media (max-width: 768px) {
+  .mealCard .row.g-2 > .col-4 {
+    margin-bottom: 0.5rem;
+  }
+
+  .mealCard .d-flex.justify-content-between {
+    gap: 1rem;
+  }
+
+  /* Badges de alimentos */
+  .mealCard .badge {
+    font-size: 0.7rem !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+}
+
+/* Melhorias para o botão de carregar mais */
+.loadMoreButton {
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-top: 2rem !important;
+  }
+}
+
+/* Animações suaves */
+.mealCard {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
