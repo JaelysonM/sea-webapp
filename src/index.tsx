@@ -9,140 +9,162 @@ import store from 'store';
 import { fetchUserData, logout, refreshToken } from 'store/auth';
 
 import App from './App';
+import { initGA } from './ga';
 
 import './global.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-let firstTry = true;
+interface NetworkError {
+  code: string;
+  config: Record<string, unknown>;
+}
 
-const publicPaths = ['login', 'change-password', 'register', 'confirm-company', 'public'];
+interface AuthError {
+  response?: {
+    status: number;
+    data?: {
+      code?: string;
+    };
+  };
+  code?: string;
+}
+
+const NETWORK_CONFIG = {
+  MAX_RETRIES: 4,
+  BASE_DELAY: 1000,
+  TOAST_DURATION: 3000,
+} as const;
+
+const PUBLIC_PATHS = ['login', 'change-password', 'register', 'public'] as const;
+
+let isFirstAuthAttempt = true;
+let networkRetryCount = 0;
+
+const resetNetworkRetryCount = (): void => {
+  networkRetryCount = 0;
+};
+
+const handleNetworkError = async (error: NetworkError): Promise<unknown> => {
+  networkRetryCount++;
+
+  if (networkRetryCount < NETWORK_CONFIG.MAX_RETRIES) {
+    const delay = NETWORK_CONFIG.BASE_DELAY * networkRetryCount;
+
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        api.request(error.config).then(resolve).catch(reject);
+      }, delay);
+    });
+  }
+
+  toast.error('Conexão perdida. Você será redirecionado para o login.', {
+    duration: 5000,
+  });
+
+  store.dispatch(logout());
+  resetNetworkRetryCount();
+
+  return Promise.reject(error);
+};
+
+const handleAuthError = async (error: AuthError): Promise<void> => {
+  const response = error.response;
+
+  const logoutUser = (): void => {
+    store.dispatch(logout());
+  };
+
+  if (response?.status === 403 && response.data?.code === 'not_permission') {
+    toast.error('Você não possui permissão para acessar este recurso', {
+      duration: 5000,
+    });
+    logoutUser();
+    return;
+  }
+
+  if (isFirstAuthAttempt && response?.status === 403) {
+    isFirstAuthAttempt = false;
+    delete api.defaults.headers.common.Authorization;
+
+    const isOnPublicPath = PUBLIC_PATHS.some((path) => window.location.pathname.includes(path));
+
+    if (isOnPublicPath || !store.getState().auth.access_token) {
+      return;
+    }
+
+    try {
+      await store.dispatch(refreshToken()).unwrap();
+
+      const accessToken = store.getState().auth.access_token;
+      if (accessToken) {
+        api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+        store.dispatch(fetchUserData());
+      }
+    } catch {
+      logoutUser();
+    }
+  }
+};
 
 api.interceptors.response.use(
-  (config) => config,
-  (err) => {
-    const res = err.response;
-
-    if (err?.code === 'ERR_NETWORK') {
-      toast.error('Erro de conexão com o servidor', {
-        duration: 5000,
-      });
-      store.dispatch(logout());
-      return;
+  (response) => {
+    resetNetworkRetryCount();
+    isFirstAuthAttempt = true;
+    return response;
+  },
+  async (error) => {
+    if (error?.code === 'ERR_NETWORK') {
+      return handleNetworkError(error as NetworkError);
     }
 
-    const kickUser = () => {
-      store.dispatch(logout());
-      toast.error('Você não está autorizado a acessar este recurso', {
-        duration: 5000,
-      });
-    };
+    await handleAuthError(error as AuthError);
 
-    if (res?.status === 403 && res.data['code'] === 'not_permission') {
-      kickUser();
-      return;
-    }
-    if (firstTry && (res?.status === 403 || err.code === 'ERR_NETWORK')) {
-      delete api.defaults.headers.common.Authorization;
-
-      publicPaths.forEach((path) => {
-        if (window.location.pathname.includes(path)) {
-          firstTry = false;
-        }
-      });
-
-      store
-        .dispatch(refreshToken())
-        .then(() => {
-          const accessToken = store.getState().auth.access_token;
-          if (accessToken) {
-            api.defaults.headers.common['Authorization'] = `Bearer ${
-              store.getState().auth.access_token
-            }`;
-            store.dispatch(fetchUserData());
-          }
-        })
-        .catch(kickUser);
-    }
-
-    return Promise.reject(err);
+    return Promise.reject(error);
   },
 );
 
-api.interceptors.request.use(
-  (config) => {
-    const url = (config.url = config.url?.replace(/\/+$/, ''));
+const waitForUserData = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const startTime = Date.now();
+    const TIMEOUT = 10000;
 
-    if (url?.includes('/auth')) {
+    const checkUserData = async (): Promise<void> => {
+      while (!store.getState().auth.userData) {
+        if (Date.now() - startTime > TIMEOUT) {
+          reject(new Error('Timeout: User data not loaded within 10 seconds'));
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+      resolve();
+    };
+
+    checkUserData();
+  });
+};
+
+api.interceptors.request.use(
+  async (config) => {
+    if (config.url) {
+      config.url = config.url.replace(/\/+$/, '');
+    }
+
+    if (config.url?.includes('/auth')) {
       return config;
     }
 
     const { access_token, userData } = store.getState().auth;
 
     if (access_token && !userData) {
-      return new Promise((resolve, reject) => {
-        const checkUserData = async () => {
-          const startTime = Date.now();
-          const timeout = 10000;
-
-          while (!store.getState().auth.userData) {
-            if (Date.now() - startTime > timeout) {
-              reject(new Error('Timeout: Usuário não foi carregado em 10 segundos'));
-              return;
-            }
-            await new Promise((resolve) => setTimeout(resolve, 50));
-          }
-          const company = localStorage.getItem('@sicria/company');
-          if (company) config.headers['Company-ID'] = company;
-          resolve(config);
-        };
-        checkUserData();
-      });
+      await waitForUserData();
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
-api.interceptors.response.use(
-  (config) => config,
-  (err) => {
-    const res = err.response;
-
-    const kickUser = () => {
-      store.dispatch(logout());
-    };
-    if (res?.status === 403 && res.data['code'] === 'not_permission') {
-      kickUser();
-      return;
-    }
-    if (firstTry && (res?.status === 403 || err.code === 'ERR_NETWORK')) {
-      delete api.defaults.headers.common.Authorization;
-
-      publicPaths.forEach((path) => {
-        if (window.location.pathname.includes(path)) {
-          firstTry = false;
-        }
-      });
-      if (!store.getState().auth.access_token) return;
-
-      store
-        .dispatch(refreshToken())
-        .then(() => {
-          api.defaults.headers.common['Authorization'] = `Bearer ${
-            store.getState().auth.access_token
-          }`;
-          store.dispatch(fetchUserData());
-        })
-        .catch(kickUser);
-    }
-
-    return Promise.reject(err);
-  },
-);
 const domNode = document.getElementById('root');
 if (domNode !== null) {
   const root = createRoot(domNode);
@@ -169,3 +191,5 @@ if (domNode !== null) {
     </Provider>,
   );
 }
+
+initGA();

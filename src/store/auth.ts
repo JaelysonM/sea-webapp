@@ -72,7 +72,7 @@ export const loginWithCredentials = createAsyncThunk(
 export const refreshToken = createAsyncThunk(
   'REFRESH_TOKEN',
   async (): Promise<AuthenticationResponse> => {
-    const refresh_token = localStorage.getItem('@sea/refresh');
+    const refresh_token = sessionStorage.getItem('@sea/refresh');
     return (
       await api.post('/auth/refresh', {
         refresh_token,
@@ -92,8 +92,8 @@ const buildInitialState = (): AuthState => ({
 const initialState = buildInitialState();
 
 try {
-  const refresh = localStorage.getItem('@sea/refresh');
-  const access = localStorage.getItem('@sea/access');
+  const refresh = sessionStorage.getItem('@sea/refresh');
+  const access = sessionStorage.getItem('@sea/access');
 
   if (typeof access === 'string') {
     const { user_id } = jwt(access) satisfies AuthState;
@@ -151,21 +151,21 @@ export const persistor: Middleware = (store) => (next) => (action) => {
 
     const accessConditions = {
       true: () => {
-        localStorage.setItem('@sea/access', access_token);
+        sessionStorage.setItem('@sea/access', access_token);
         api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
       },
       false: () => {
-        localStorage.removeItem('@sea/access');
+        sessionStorage.removeItem('@sea/access');
         delete api.defaults.headers.common.Authorization;
       },
     };
 
     const refreshConditions = {
       true: () => {
-        localStorage.setItem('@sea/refresh', refresh_token);
+        sessionStorage.setItem('@sea/refresh', refresh_token);
       },
       false: () => {
-        localStorage.removeItem('@sea/refresh');
+        sessionStorage.removeItem('@sea/refresh');
       },
     };
 
@@ -197,8 +197,8 @@ const setTokens = (state: AuthState, res: AuthenticationResponse): AuthState => 
 };
 
 const removeTokens = () => {
-  localStorage.removeItem('@sea/access');
-  localStorage.removeItem('@sea/refresh');
+  sessionStorage.removeItem('@sea/access');
+  sessionStorage.removeItem('@sea/refresh');
   delete api.defaults.headers.common.Authorization;
   return buildInitialState();
 };
