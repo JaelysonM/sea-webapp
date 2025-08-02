@@ -9,8 +9,10 @@ import {
   PieChartWithOverlay,
   QRCodeScanner,
 } from 'components/containers';
+import { PieChartSliceData } from 'components/elements/PieChart/PieChart';
 import { useAnimatedCounter, useWindowSize } from 'components/hooks';
 
+import MacroDetailsModal from './MacroDetailsModal';
 import ProcessingLoader from './ProcessingLoader';
 import useCurrentMeal from './useCurrentMeal';
 import useInitializeMeal from './useInitializeMeal';
@@ -22,6 +24,8 @@ const Plate: React.FC = () => {
   const { processedMeal, isLoading, error, refetch } = useCurrentMeal();
   const { initializeMeal } = useInitializeMeal();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showMacroModal, setShowMacroModal] = useState(false);
+  const [selectedSlice, setSelectedSlice] = useState<PieChartSliceData | null>(null);
 
   const handleQRScan = async (result: string) => {
     setIsProcessing(true);
@@ -115,7 +119,8 @@ const Plate: React.FC = () => {
           chartSlices={processedMeal.chartSlices}
           chartSize={Math.min(width * 0.5, 300)}
           onSliceDetailClick={(slice) => {
-            console.log(`Detalhes do slice: ${slice.label} - ${slice.percentage}%`);
+            setSelectedSlice(slice);
+            setShowMacroModal(true);
           }}
         />
       </div>
@@ -163,6 +168,17 @@ const Plate: React.FC = () => {
           }}
         />
       </Container>
+
+      <MacroDetailsModal
+        show={showMacroModal}
+        onHide={() => setShowMacroModal(false)}
+        slice={selectedSlice}
+        totalMacros={{
+          protein: processedMeal.totalProtein,
+          carbs: processedMeal.totalCarbs,
+          fat: processedMeal.totalFat,
+        }}
+      />
     </Container>
   );
 };

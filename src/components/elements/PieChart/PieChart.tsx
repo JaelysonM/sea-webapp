@@ -63,6 +63,57 @@ const PieChart: React.FC<PieChartProps> = ({
           })}
         </defs>
         {slices.map((slice) => {
+          if (slices.length === 1) {
+            const fillType = slice.imageSrc ? `url(#pattern-${slice.id})` : slice.color;
+
+            const slicePopover = (
+              <Popover id={`popover-slice-${slice.id}`} placement='auto'>
+                <Popover.Body className='d-flex flex-row align-items-center justify-content-between gap-2 p-2'>
+                  <p className='mb-0' style={{ color: '#68717A' }}>
+                    {slice.label} {slice.details}
+                  </p>
+                  {onSliceDetailClick && (
+                    <Button
+                      variant='link'
+                      size='sm'
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSliceDetailClick(slice);
+                        document.body.click();
+                      }}
+                      className='p-0 d-flex align-items-center'
+                      style={{ color: 'var(--bs-primary)' }}
+                    >
+                      <i
+                        className='bi bi-eye-fill'
+                        style={{ marginRight: '0.3rem', verticalAlign: 'middle', fontSize: '1rem' }}
+                        aria-hidden='true'
+                      ></i>
+                    </Button>
+                  )}
+                </Popover.Body>
+              </Popover>
+            );
+
+            return (
+              <OverlayTrigger
+                key={slice.id}
+                trigger='click'
+                rootClose
+                placement='auto'
+                overlay={slicePopover}
+              >
+                <circle
+                  cx={center}
+                  cy={center}
+                  r={radius}
+                  fill={fillType || 'transparent'}
+                  style={{ cursor: 'pointer' }}
+                />
+              </OverlayTrigger>
+            );
+          }
+
           const [startX, startY] = getCoordinatesForPercent(cumulativePercentage / 100);
           const currentSlicePercentage = slice.percentage;
           cumulativePercentage += currentSlicePercentage;
