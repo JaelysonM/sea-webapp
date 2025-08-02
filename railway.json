@@ -6,7 +6,7 @@
     "watchPatterns": ["src/**"]
   },
   "deploy": {
-    "startCommand": "npx serve dist -s -l 3000",
+    "startCommand": "npx serve dist -s -l 3000 --cors",
     "healthcheckPath": "/",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
