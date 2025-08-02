@@ -1,7 +1,7 @@
 import ReactGA from 'react-ga4';
 
 export const initGA = () => {
-  const measurementId = process.env.VITE_APP_GA_MEASUREMENT_ID;
+  const measurementId = import.meta.env.VITE_APP_GA_MEASUREMENT_ID;
   if (!measurementId) {
     console.error('VITE_APP_GA_MEASUREMENT_ID is not defined');
     return;
