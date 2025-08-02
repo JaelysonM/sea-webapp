@@ -1,11 +1,16 @@
 import React from 'react';
-import { Alert, Col, Container, Row } from 'react-bootstrap';
-import { useLocation } from 'react-router-dom';
+import { Alert, Button, Col, Container, Row } from 'react-bootstrap';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NotAuthenticated: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const fromPath = (location.state as { from?: Location })?.from?.pathname || '/';
+
+  const handleLoginClick = () => {
+    navigate('/login', { state: { from: location.state?.from } });
+  };
 
   return (
     <Container className='mt-5 text-center' data-testid='not-authenticated-page'>
@@ -22,6 +27,11 @@ const NotAuthenticated: React.FC = () => {
                 Após o login, tentaremos redirecioná-lo para: {fromPath}
               </p>
             )}
+            <div className='mt-3'>
+              <Button variant='primary' onClick={handleLoginClick} className='me-2'>
+                Fazer Login
+              </Button>
+            </div>
           </Alert>
         </Col>
       </Row>

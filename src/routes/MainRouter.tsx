@@ -5,6 +5,7 @@ import {
   AnonymousAuthentication,
   AnonymousLogout,
   Loading,
+  Login,
   NotAuthenticated,
   NotAuthorized,
   NotFound,
@@ -27,6 +28,7 @@ const MainRouter: React.FC = () => {
     <Router>
       <Routes>
         <Route element={<PublicRoute />}>
+          <Route path='/login' element={<Login />} />
           <Route path='/authenticate' element={<AnonymousAuthentication />} />
           <Route path='/logout' element={<AnonymousLogout />} />
           <Route path='/not-found' element={<NotFound />} />

@@ -41,6 +41,11 @@ type FastAuth = {
   token: string;
 };
 
+type LoginCredentials = {
+  email: string;
+  password: string;
+};
+
 export const logout = createAction('LOGOUT');
 
 export const login = createAsyncThunk('LOGIN', async (data: FastAuth, { rejectWithValue }) => {
@@ -51,6 +56,18 @@ export const login = createAsyncThunk('LOGIN', async (data: FastAuth, { rejectWi
     return rejectWithValue((error as AxiosError).response?.data);
   }
 });
+
+export const loginWithCredentials = createAsyncThunk(
+  'LOGIN_WITH_CREDENTIALS',
+  async (data: LoginCredentials, { rejectWithValue }) => {
+    try {
+      const request = await api.post<AuthenticationResponse>('auth/login', data);
+      return request.data;
+    } catch (error) {
+      return rejectWithValue((error as AxiosError).response?.data);
+    }
+  },
+);
 
 export const refreshToken = createAsyncThunk(
   'REFRESH_TOKEN',
@@ -116,8 +133,11 @@ export const isUser = (state: RootState) => {
 };
 
 const actionTypes = [
+  logout.type,
   login.fulfilled.type,
   login.rejected.type,
+  loginWithCredentials.fulfilled.type,
+  loginWithCredentials.rejected.type,
   refreshToken.fulfilled.type,
   refreshToken.rejected.type,
   fetchUserData.fulfilled.type,
@@ -185,8 +205,29 @@ const removeTokens = () => {
 
 export default createReducer(initialState, (builder) => {
   builder
-    .addCase(login.rejected, () => buildInitialState())
+    .addCase(login.rejected, (state) => {
+      console.log('Login failed, clearing state');
+      return {
+        ...state,
+        status: 'unauthenticated' as const,
+        access_token: undefined,
+        refresh_token: undefined,
+        user_id: undefined,
+      };
+    })
     .addCase(login.fulfilled, (state: AuthState, action) => setTokens(state, action.payload))
+    .addCase(loginWithCredentials.rejected, (state) => {
+      return {
+        ...state,
+        status: 'unauthenticated' as const,
+        access_token: undefined,
+        refresh_token: undefined,
+        user_id: undefined,
+      };
+    })
+    .addCase(loginWithCredentials.fulfilled, (state: AuthState, action) =>
+      setTokens(state, action.payload),
+    )
     .addCase(fetchUserData.rejected, () => buildInitialState())
     .addCase(fetchUserData.fulfilled, (state: AuthState, action) => {
       return {

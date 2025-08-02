@@ -2,10 +2,9 @@ import { useDispatch } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import auth, { persistor } from './auth';
-import message from './message';
 import stores from './stores';
 
-const rootReducer = combineReducers({ auth, message, stores });
+const rootReducer = combineReducers({ auth, stores });
 
 export type RootState = ReturnType<typeof rootReducer>;
 

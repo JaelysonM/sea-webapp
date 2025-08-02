@@ -69,6 +69,7 @@
     "react-router-dom": "^6.16.0",
     "sass-loader": "^13.3.2",
     "serve": "^14.2.1",
+    "sonner": "^2.0.6",
     "zod": "^3.24.1"
   },
   "devDependencies": {

@@ -26,7 +26,7 @@ const PrivateRoute = ({ ...rest }) => {
   }
 
   if (!authenticated && !access_token) {
-    return <Navigate to='/not-authenticated' replace state={{ from: location }} />;
+    return <Navigate to='/login' replace state={{ from: location }} />;
   }
 
   if (access_token && !authenticated) {
