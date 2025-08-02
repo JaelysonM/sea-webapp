@@ -7,16 +7,19 @@ import { ProcessedFood } from '@types';
 import { FoodCard, SwipeableContainer } from 'components/containers';
 
 import DeleteConfirmationModal from './DeleteConfirmationModal';
+import ResetMenuModal from './ResetMenuModal';
 import ScaleDetachModal from './ScaleDetachModal';
 import ScaleSelectionModal from './ScaleSelectionModal';
 import useDeleteFood from './useDeleteFood';
 import useFoodsList from './useFoodsList';
+import useResetMenu from './useResetMenu';
 import useScales from './useScales';
 import useUpdateFoodScale from './useUpdateFoodScale';
 
 const Dishes: React.FC = () => {
   const [foodToDelete, setFoodToDelete] = useState<{ id: number; name: string } | null>(null);
   const [foodToUpdateScale, setFoodToUpdateScale] = useState<ProcessedFood | null>(null);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const { processedFoods, isLoading, hasNextPage, fetchNextPage, refetch } = useFoodsList({
     page_size: 10,
@@ -29,6 +32,13 @@ const Dishes: React.FC = () => {
     error: updateError,
     setError: setUpdateError,
   } = useUpdateFoodScale();
+  const {
+    resetMenu,
+    isResetting,
+    progress: resetProgress,
+    error: resetError,
+    setError: setResetError,
+  } = useResetMenu();
 
   const handleDeleteFood = useCallback((foodId: number, foodName: string) => {
     setFoodToDelete({ id: foodId, name: foodName });
@@ -81,6 +91,25 @@ const Dishes: React.FC = () => {
     setUpdateError(null);
   }, [setUpdateError]);
 
+  const handleResetMenu = useCallback(() => {
+    setShowResetModal(true);
+  }, []);
+
+  const confirmResetMenu = useCallback(async () => {
+    await resetMenu(processedFoods);
+  }, [resetMenu, processedFoods]);
+
+  const handleCloseResetModal = useCallback(() => {
+    if (!isResetting) {
+      setShowResetModal(false);
+      setResetError(null);
+      // Recarregar dados após reset completo
+      if (resetProgress?.completed === resetProgress?.total) {
+        refetch();
+      }
+    }
+  }, [isResetting, setResetError, resetProgress, refetch]);
+
   if (isLoading && processedFoods.length === 0) {
     return (
       <div
@@ -98,7 +127,8 @@ const Dishes: React.FC = () => {
         <Link to='new'>
           <Button>Novo prato</Button>
         </Link>
-        <Button variant='outline-primary' onClick={() => refetch()}>
+        <Button variant='outline-primary' onClick={handleResetMenu} disabled={isLoading}>
+          <i className='bi bi-arrow-clockwise me-1'></i>
           Reiniciar Menu
         </Button>
       </div>
@@ -118,6 +148,12 @@ const Dishes: React.FC = () => {
       {scalesError && (
         <Alert variant='warning' onClose={() => {}} dismissible>
           {scalesError}
+        </Alert>
+      )}
+
+      {resetError && (
+        <Alert variant='danger' onClose={() => setResetError(null)} dismissible>
+          {resetError}
         </Alert>
       )}
 
@@ -206,6 +242,15 @@ const Dishes: React.FC = () => {
           isLoading={updateLoading}
         />
       )}
+
+      <ResetMenuModal
+        show={showResetModal}
+        onHide={handleCloseResetModal}
+        onConfirm={confirmResetMenu}
+        isResetting={isResetting}
+        progress={resetProgress}
+        error={resetError}
+      />
     </div>
   );
 };

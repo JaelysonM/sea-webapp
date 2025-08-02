@@ -52,7 +52,7 @@ const useMealHistory = (pageSize: number = 10) => {
     async ({ pageParam = 1 }): Promise<MealHistoryResponse> => {
       try {
         setError(null);
-        const response = await api.get<MealHistoryResponse>('/auth/meals/', {
+        const response = await api.get<MealHistoryResponse>('/auth/meals', {
           params: {
             page: pageParam,
             size: pageSize,

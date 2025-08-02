@@ -203,7 +203,7 @@ const History: React.FC = () => {
         <div>
           <h2 className='h4 fw-bold mb-1'>Histórico de Refeições</h2>
           <small className='text-muted'>
-            {totalResults} {totalResults >= 1 ? 'refeições' : 'refeição'} encontrada
+            {totalResults} {totalResults > 1 ? 'refeições' : 'refeição'} encontrada
             {totalResults !== 1 ? 's' : ''}
           </small>
         </div>

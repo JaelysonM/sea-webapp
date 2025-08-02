@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { UserLayout } from 'layouts';
 import { Loading, NotAuthorized, NotFound } from 'pages/shared';
-import { Dashboard, History, Menu, Plate } from 'pages/user';
+import { Dashboard, History, Menu, Plate, Profile } from 'pages/user';
 import { isAuthenticated, isUser, isUserDataLoaded } from 'store/auth';
 
 export const UserRouter = () => {
@@ -27,6 +27,7 @@ export const UserRouter = () => {
           <Route path='menu' element={<Menu />} />
           <Route path='history' element={<History />} />
         </Route>
+        <Route path='profile' element={<Profile />} />
         <Route path='*' element={<NotFound />} />
       </Route>
     </Routes>
