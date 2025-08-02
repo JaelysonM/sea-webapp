@@ -22,7 +22,7 @@ export default defineConfig({
       'package.json': path.resolve(__dirname, 'package.json'),
     },
   },
-  base: './',
+  base: '/',
   css: {
     preprocessorOptions: {
       scss: {
