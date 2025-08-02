@@ -5,8 +5,8 @@ import { CALORIE_FACTORS, NUTRIENT_FIELDS_CONFIG } from 'consts';
 
 import { ImageUpload } from 'components/elements';
 
+import { useAuthenticatedNutritionApi } from './useAuthenticatedNutritionApi';
 import useCreateFood from './useCreateFood';
-import { useNutritionApi } from './useNutritionApi';
 
 const initialFormState = {
   name: '',
@@ -26,7 +26,7 @@ const NewDish: React.FC = () => {
     error: nutritionError,
     fetchNutritionData,
     setError: setNutritionError,
-  } = useNutritionApi();
+  } = useAuthenticatedNutritionApi();
   const {
     createFood,
     isLoading: createLoading,
