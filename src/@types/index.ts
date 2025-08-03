@@ -141,3 +141,41 @@ export interface ProcessedMeal {
     details?: string;
   }>;
 }
+
+// Web NFC API Types
+export interface NDEFRecord {
+  recordType: string;
+  mediaType?: string;
+  id?: string;
+  data?: ArrayBuffer;
+  encoding?: string;
+  lang?: string;
+}
+
+export interface NDEFMessage {
+  records: NDEFRecord[];
+}
+
+export interface NDEFReadingEvent extends Event {
+  serialNumber: string;
+  message: NDEFMessage;
+}
+
+export interface NDEFReader extends EventTarget {
+  scan(options?: NDEFScanOptions): Promise<void>;
+  stop(): Promise<void>;
+  onreading: ((event: NDEFReadingEvent) => void) | null;
+  onreadingerror: ((event: Event) => void) | null;
+}
+
+export interface NDEFScanOptions {
+  signal?: AbortSignal;
+}
+
+declare global {
+  interface Window {
+    NDEFReader?: {
+      new (): NDEFReader;
+    };
+  }
+}

@@ -1,0 +1,14 @@
+@import '~/helpers.scss';
+
+.nfcIndicator {
+  background: white;
+  border-radius: var(--bs-border-radius);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.nfcIcon {
+  i {
+    transition: all 0.3s ease;
+    animation: pulse 1.5s infinite;
+  }
+}

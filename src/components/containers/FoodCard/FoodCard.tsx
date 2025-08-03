@@ -25,7 +25,7 @@ const FoodCard: React.FC<Props> = ({
   tag,
   className = '',
 }) => {
-  const imageStatus = useImageLoader(imageUrl);
+  const { status: imageStatus, imageUrl: imageSource } = useImageLoader(imageUrl);
 
   return (
     <Card className={`border rounded ${className}`}>
@@ -44,10 +44,15 @@ const FoodCard: React.FC<Props> = ({
             )}
             {imageStatus === 'loaded' && (
               <Image
-                src={imageUrl}
+                src={imageSource || imageUrl}
                 fluid
+                loading='lazy'
                 className='w-100 h-100'
-                style={{ objectFit: 'cover', pointerEvents: 'none' }}
+                style={{
+                  objectFit: 'cover',
+                  pointerEvents: 'none',
+                  borderRadius: '0.375rem 0 0 0.375rem',
+                }}
               />
             )}
           </Col>

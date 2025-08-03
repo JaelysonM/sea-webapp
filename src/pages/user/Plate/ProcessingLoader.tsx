@@ -12,10 +12,8 @@ const ProcessingLoader: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Fade in animation
     setFadeIn(true);
 
-    // Simular progresso das etapas
     const stepInterval = setInterval(() => {
       setCurrentStep((prev) => {
         if (prev < steps.length - 1) {
@@ -47,7 +45,7 @@ const ProcessingLoader: React.FC = () => {
           >
             <i className='bi bi-check-circle text-success' style={{ fontSize: '2.5rem' }}></i>
           </div>
-          <h4 className='fw-bold text-dark mb-3'>QR Code Capturado!</h4>
+          <h4 className='fw-bold text-dark mb-3'>Prato identificado com sucesso!</h4>
           <p className='text-muted mb-4'>
             Identificamos seu prato com sucesso. Agora estamos processando as informações
             nutricionais...
@@ -74,26 +72,6 @@ const ProcessingLoader: React.FC = () => {
           ))}
         </div>
       </div>
-
-      {/* Adicionar CSS para animações */}
-      <style>
-        {`
-          .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-          }
-          
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}
-      </style>
     </Container>
   );
 };

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button, OverlayTrigger, Popover, Spinner } from 'react-bootstrap';
+
+import { usePieChartImageCache } from './usePieChartImageCache';
 
 export interface PieChartSliceData {
   id: string | number;
@@ -23,6 +25,7 @@ const PieChart: React.FC<PieChartProps> = ({
   className = '',
   onSliceDetailClick,
 }) => {
+  const { allImagesLoaded, cachedSlices } = usePieChartImageCache({ slices });
   const radius = size / 2;
   const center = radius;
   let cumulativePercentage = 0;
@@ -35,9 +38,27 @@ const PieChart: React.FC<PieChartProps> = ({
 
   return (
     <div style={{ position: 'relative', width: size, height: size }} className={className}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {!allImagesLoaded && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 10,
+          }}
+        >
+          <Spinner animation='border' size='sm' variant='secondary' />
+        </div>
+      )}
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ opacity: allImagesLoaded ? 1 : 0.3 }}
+      >
         <defs>
-          {slices.map((slice) => {
+          {cachedSlices.map((slice) => {
             if (slice.imageSrc) {
               const patternId = `pattern-${slice.id}`;
               return (
@@ -62,8 +83,8 @@ const PieChart: React.FC<PieChartProps> = ({
             return null;
           })}
         </defs>
-        {slices.map((slice) => {
-          if (slices.length === 1) {
+        {cachedSlices.map((slice) => {
+          if (cachedSlices.length === 1) {
             const fillType = slice.imageSrc ? `url(#pattern-${slice.id})` : slice.color;
 
             const slicePopover = (

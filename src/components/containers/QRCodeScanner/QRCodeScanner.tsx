@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Container, Spinner, Toast } from 'react-bootstrap';
 import { BrowserMultiFormatReader } from '@zxing/library';
 
+import styles from './QRCodeScanner.module.scss';
+
 interface QRCodeScannerProps {
   onScan: (result: string) => void;
   onError?: (error: Error) => void;
@@ -21,7 +23,6 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
 
   const checkCameraPermission = useCallback(async () => {
     try {
-      // Configuração melhorada para mobile
       const constraints = {
         video: {
           facingMode: { ideal: 'environment' },
@@ -161,7 +162,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
   if (hasPermission === false) {
     return (
       <Container className='p-0 d-flex flex-column align-items-center'>
-        <div className='card shadow-lg border-0 w-100' style={{ maxWidth: '500px' }}>
+        <div className='card shadow-lg border-0 w-100 card-fade-in' style={{ maxWidth: '500px' }}>
           <div className='card-body p-4 text-center'>
             <div className='mb-4'>
               <div
@@ -207,7 +208,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
     return (
       <>
         <Container className='p-0 d-flex flex-column align-items-center'>
-          <div className='card shadow-lg border-0 w-100' style={{ maxWidth: '500px' }}>
+          <div className='card shadow-lg border-0 w-100 card-fade-in' style={{ maxWidth: '500px' }}>
             <div className='card-body p-4 text-center'>
               <div className='mb-4'>
                 <div
@@ -270,7 +271,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
   return (
     <>
       <Container className='p-0 d-flex flex-column align-items-center'>
-        <div className='card shadow-lg border-0 w-100' style={{ maxWidth: '500px' }}>
+        <div className='card shadow-lg border-0 w-100 card-fade-in' style={{ maxWidth: '500px' }}>
           <div className='card-header bg-success text-white text-center py-3 border-0'>
             <h5 className='mb-0 fw-bold'>
               <i className='bi bi-camera-video me-2'></i>
@@ -307,20 +308,17 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
                   muted
                 />
 
-                {/* Overlay de scanning com animação */}
                 <div
-                  className='position-absolute top-50 start-50 translate-middle border border-2 border-white rounded-3'
+                  className={`position-absolute top-50 start-50 translate-middle border border-2 border-white rounded-3 ${styles.pulse}`}
                   style={{
                     width: '70%',
                     height: '70%',
                     borderStyle: 'dashed',
                     borderColor: 'rgba(255,255,255,0.9)',
                     pointerEvents: 'none',
-                    animation: 'pulse 2s infinite',
                   }}
                 />
 
-                {/* Indicadores de canto */}
                 <div
                   className='position-absolute'
                   style={{
@@ -370,13 +368,11 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
                   }}
                 />
               </div>
-
-              {/* Status indicator */}
               <div className='text-center mt-3'>
                 <div className='d-inline-flex align-items-center px-3 py-1 bg-success bg-opacity-10 rounded-pill'>
                   <div
-                    className='me-2 rounded-circle bg-success'
-                    style={{ width: '8px', height: '8px', animation: 'pulse 1s infinite' }}
+                    className={`me-2 rounded-circle bg-success ${styles.pulse}`}
+                    style={{ width: '8px', height: '8px' }}
                   />
                   <small className='text-success fw-semibold'>Procurando QR Code...</small>
                 </div>
@@ -417,26 +413,6 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, onError }) => {
         </Toast.Header>
         <Toast.Body className='bg-white'>{toastMessage}</Toast.Body>
       </Toast>
-
-      {/* Adicionar CSS para animações */}
-      <style>
-        {`
-          @keyframes pulse {
-            0% {
-              opacity: 1;
-              transform: scale(1);
-            }
-            50% {
-              opacity: 0.5;
-              transform: scale(1.05);
-            }
-            100% {
-              opacity: 1;
-              transform: scale(1);
-            }
-          }
-        `}
-      </style>
     </>
   );
 };

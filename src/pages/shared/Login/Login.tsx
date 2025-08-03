@@ -41,7 +41,6 @@ const Login: React.FC = () => {
   });
 
   useEffect(() => {
-    // Limpar erro quando component monta
     setLoginError('');
   }, []);
 
@@ -53,7 +52,6 @@ const Login: React.FC = () => {
       const result = await dispatch(loginWithCredentials(data));
 
       if (loginWithCredentials.rejected.match(result)) {
-        // Tratamento de diferentes tipos de erro
         const error = result.payload as LoginError;
         console.log('Login error:', error);
 
@@ -68,9 +66,6 @@ const Login: React.FC = () => {
         } else {
           setLoginError('Credenciais inválidas. Verifique seu email e senha.');
         }
-      } else if (loginWithCredentials.fulfilled.match(result)) {
-        // Login bem-sucedido, não fazemos nada aqui pois o estado já foi atualizado
-        console.log('Login successful');
       }
     } catch (error) {
       console.error('Login exception:', error);

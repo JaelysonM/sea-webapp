@@ -16,12 +16,18 @@ const AppRouter = () => {
   }
 
   return (
-    <Routes>
-      <Route path='/user/*' Component={UserRouter} />
-      <Route path='/admin/*' Component={AdminRouter} />
-      <Route path='/' element={<Navigate to={userIsAdmin ? '/admin' : '/user'} replace />} />
-      <Route path='*' element={<NotFound />} />
-    </Routes>
+    <div
+      style={{
+        marginBottom: '2rem',
+      }}
+    >
+      <Routes>
+        <Route path='/user/*' Component={UserRouter} />
+        <Route path='/admin/*' Component={AdminRouter} />
+        <Route path='/' element={<Navigate to={userIsAdmin ? '/admin' : '/user'} replace />} />
+        <Route path='*' element={<NotFound />} />
+      </Routes>
+    </div>
   );
 };
 

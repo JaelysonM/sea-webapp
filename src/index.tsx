@@ -58,7 +58,7 @@ const handleNetworkError = async (error: NetworkError): Promise<unknown> => {
     });
   }
 
-  toast.error('Conexão perdida. Você será redirecionado para o login.', {
+  toast.error('Conexão perdida. Verifique sua internet e tente novamente.', {
     duration: 5000,
   });
 

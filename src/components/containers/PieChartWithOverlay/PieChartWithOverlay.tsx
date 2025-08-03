@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { PieChart, PieChartSliceData } from 'components/elements';
+import useImageLoader from 'components/hooks/useImageLoader';
 
 interface Props {
   imageSrc: string;
@@ -43,9 +44,24 @@ const PieChartWithOverlay: React.FC<Props> = ({
     transform: 'translate(-50%, -50%)',
   };
 
+  const { status: imageStatus, imageUrl: cachedImageUrl } = useImageLoader(imageSrc);
+
   return (
     <div style={wrapperStyle} className={className}>
-      <img src={imageSrc} alt={imageAlt} style={imageStyle} />
+      {imageStatus === 'loading' && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 10,
+          }}
+        >
+          <span>Carregando imagem...</span>
+        </div>
+      )}
+      <img src={cachedImageUrl || imageSrc} alt={imageAlt} style={imageStyle} />
       <div style={chartOverlayStyle}>
         <PieChart
           slices={chartSlices}

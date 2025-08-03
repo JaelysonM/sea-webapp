@@ -21,7 +21,7 @@ const useResetMenu = () => {
     async (foodId: number): Promise<boolean> => {
       return new Promise((resolve) => {
         const formData = new FormData();
-        formData.append('scale_id', '0'); // Mandando 0 para desanexar/resetar
+        formData.append('scale_id', '0');
 
         request({
           method: 'PUT',
@@ -49,7 +49,6 @@ const useResetMenu = () => {
       setError(null);
 
       try {
-        // Filtrar apenas alimentos ativos
         const activeFoods = FoodProcessor.getActiveFoods(foods);
 
         if (activeFoods.length === 0) {
@@ -63,7 +62,6 @@ const useResetMenu = () => {
           errors: [],
         });
 
-        // Processar cada alimento ativo
         for (let i = 0; i < activeFoods.length; i++) {
           const food = activeFoods[i];
 
@@ -90,7 +88,6 @@ const useResetMenu = () => {
                 ],
           }));
 
-          // Pequena pausa entre as requisições
           if (i < activeFoods.length - 1) {
             await new Promise((resolve) => setTimeout(resolve, 300));
           }

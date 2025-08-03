@@ -7,7 +7,7 @@ import {
   DisplayBalance,
   NutrientStatCard,
   PieChartWithOverlay,
-  QRCodeScanner,
+  PlateScanner,
 } from 'components/containers';
 import { PieChartSliceData } from 'components/elements/PieChart/PieChart';
 import { useAnimatedCounter, useWindowSize } from 'components/hooks';
@@ -67,7 +67,7 @@ const Plate: React.FC = () => {
         style={{ opacity: 1, transition: 'opacity 0.3s ease-in-out' }}
       >
         <div
-          className='d-flex justify-content-center align-items-center'
+          className='d-flex justify-content-center align-items-center card-fade-in'
           style={{ minHeight: '300px' }}
         >
           <Spinner animation='border' />
@@ -83,7 +83,7 @@ const Plate: React.FC = () => {
   if (error) {
     return (
       <div style={{ opacity: 1, transition: 'opacity 0.3s ease-in-out' }}>
-        <QRCodeScanner onScan={handleQRScan} />
+        <PlateScanner onScan={handleQRScan} />
       </div>
     );
   }

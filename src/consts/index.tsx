@@ -11,8 +11,6 @@ export const API_DEFAULT_HEADERS = {
 export const SUCCESS_DURATION = 1000;
 export const ERROR_DURATION = 2000;
 
-export const PRIMARY_COLOR = '#20C997';
-
 export const CALORIE_FACTORS = {
   PROTEIN: 4,
   CARB: 4,

@@ -11,6 +11,7 @@ const useCurrentMeal = (pollingInterval = 3000) => {
     MealProcessor.processMeal(null),
   );
   const [shouldPoll, setShouldPoll] = useState(true);
+  const [isTabActive, setIsTabActive] = useState(!document.hidden);
 
   const request = useRequest();
 
@@ -24,50 +25,56 @@ const useCurrentMeal = (pollingInterval = 3000) => {
           setProcessedMeal(MealProcessor.processMeal(data));
           setError(null);
           setIsLoading(false);
-          setShouldPoll(true); // Continuar polling quando tiver sucesso
+          setShouldPoll(true);
         },
         onError: (err) => {
-          console.error('Erro ao carregar refeição atual:', err);
           setMeal(null);
           setProcessedMeal(MealProcessor.processMeal(null));
           setError('Erro ao carregar dados da refeição');
           setIsLoading(false);
 
-          // Parar polling se for erro 404 (sem refeição ativa)
           if (err && typeof err === 'object' && 'status' in err && err.status === 404) {
             setShouldPoll(false);
           } else {
-            setShouldPoll(true); // Continuar polling para outros erros
+            setShouldPoll(true);
           }
         },
       });
     } catch (err) {
-      console.error('Erro ao buscar refeição:', err);
       setMeal(null);
       setProcessedMeal(MealProcessor.processMeal(null));
       setError('Erro ao carregar dados da refeição');
       setIsLoading(false);
-      setShouldPoll(true); // Continuar polling para erros de catch
+      setShouldPoll(true);
     }
   }, [request]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsTabActive(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   useEffect(() => {
     fetchCurrentMeal();
   }, [fetchCurrentMeal]);
 
   useEffect(() => {
-    if (pollingInterval <= 0 || !shouldPoll) return;
+    if (pollingInterval <= 0 || !shouldPoll || !isTabActive) return;
 
     const interval = setInterval(() => {
       fetchCurrentMeal();
     }, pollingInterval);
 
     return () => clearInterval(interval);
-  }, [fetchCurrentMeal, pollingInterval, shouldPoll]);
+  }, [fetchCurrentMeal, pollingInterval, shouldPoll, isTabActive]);
 
   const refetch = useCallback(() => {
     setIsLoading(true);
-    setShouldPoll(true); // Reativar polling quando refetch for chamado manualmente
+    setShouldPoll(true);
     fetchCurrentMeal();
   }, [fetchCurrentMeal]);
 
