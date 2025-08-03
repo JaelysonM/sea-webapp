@@ -1,0 +1,65 @@
+.navContainer {
+  position: relative;
+}
+
+.customDashboardTabs {
+  width: fit-content;
+  border: none !important;
+  flex-wrap: nowrap !important;
+  min-width: max-content;
+}
+
+.tabLink {
+  composes: nav-link from global;
+  border: none !important;
+  border-bottom: 1.5px solid transparent !important;
+  color: var(--bs-secondary) !important;
+  font-weight: normal !important;
+  padding-top: 0.5rem !important;
+  padding-bottom: calc(0.5rem - 3px) !important;
+  margin-right: 1rem;
+  text-align: center;
+  transition: opacity 0.8s ease !important;
+  text-decoration: none !important;
+  position: relative;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    opacity: 0.5;
+    text-decoration: none !important;
+  }
+}
+
+.activeTabLink {
+  color: var(--bs-primary) !important;
+  font-weight: normal !important;
+  border-bottom-color: transparent !important;
+  background-color: transparent !important;
+}
+
+.activeIndicator {
+  position: absolute;
+  bottom: 0;
+  height: 1.5px;
+  background-color: var(--bs-primary);
+  transition:
+    left 0.3s ease-in-out,
+    width 0.3s ease-in-out;
+  z-index: 1;
+}
+
+.tabContent {
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+
+  &.transitioning {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+}

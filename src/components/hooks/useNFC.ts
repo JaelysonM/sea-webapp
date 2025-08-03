@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { NDEFReader, NDEFReadingEvent } from '@types';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import type { NDEFReadingEvent } from '@types';
 
 interface UseNFCReturn {
   isReading: boolean;
@@ -13,101 +13,87 @@ interface UseNFCReturn {
   clear: () => void;
 }
 
-/**
- * Hook para leitura de tags NFC
- * @returns Objeto com estado e métodos para controle da leitura NFC
- */
 const useNFC = (): UseNFCReturn => {
   const [isReading, setIsReading] = useState(false);
   const [data, setData] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [ndefReader, setNdefReader] = useState<NDEFReader | null>(null);
 
-  const isSupported = 'NDEFReader' in window;
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  const getUnsupportedReason = (): string | null => {
-    if (!('NDEFReader' in window)) {
-      return 'Web NFC API não está disponível neste navegador';
+  const isSupported = useMemo(() => 'NDEFReader' in window, []);
+
+  const unsupportedReason = useMemo(() => {
+    if (!isSupported) {
+      return 'A API Web NFC não está disponível neste navegador.';
     }
-
-    if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-      return 'NFC requer HTTPS ou localhost';
+    if (!window.isSecureContext && window.location.hostname !== 'localhost') {
+      return 'A leitura de NFC requer um contexto seguro (HTTPS).';
     }
-
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isAndroid = userAgent.includes('android');
-    const isChrome = userAgent.includes('chrome') && !userAgent.includes('edg');
-    const isEdge = userAgent.includes('edg');
-
-    if (!isAndroid) {
-      return 'NFC só funciona em dispositivos Android';
-    }
-
-    if (!isChrome && !isEdge) {
-      return 'NFC só funciona no Chrome ou Edge';
-    }
-
     return null;
-  };
+  }, [isSupported]);
 
-  const unsupportedReason = getUnsupportedReason();
   const canUseNFC = isSupported && !unsupportedReason;
 
-  /**
-   * Inicia a leitura de tags NFC
-   */
+  const stopReading = useCallback(async (): Promise<void> => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsReading(false);
+  }, []);
+
   const startReading = useCallback(async (): Promise<void> => {
     if (!canUseNFC) {
-      setError(unsupportedReason || 'NFC não disponível');
+      setError(unsupportedReason || 'NFC não é suportado ou está desabilitado.');
+      return;
+    }
+    if (isReading) {
+      console.warn('A leitura de NFC já está ativa.');
       return;
     }
 
+    await stopReading();
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
-      setIsReading(true);
-      setError(null);
-      setData(null);
-
       const reader = new window.NDEFReader!();
-      setNdefReader(reader);
 
-      await reader.scan();
+      setData(null);
+      setError(null);
+      setIsReading(true);
+
+      await reader.scan({ signal: controller.signal });
 
       reader.onreading = (event: NDEFReadingEvent) => {
         if (event.serialNumber) {
-          setData(event.serialNumber.toUpperCase());
-          return;
+          const formattedSerial = event.serialNumber.toUpperCase().replace(/:/g, '-');
+          setData(formattedSerial);
+          stopReading();
+        } else {
+          setError('A tag NFC não possui um número de série.');
+          stopReading();
         }
-        setError('Tag detectada sem número de série');
       };
 
-      reader.onreadingerror = () => {
-        setError('Erro ao ler tag NFC');
+      reader.onreadingerror = (event) => {
+        console.error('Erro ao ler a tag NFC.', event);
+        setError('Não foi possível ler a tag NFC.');
+        stopReading();
       };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
-      setError(`Erro ao iniciar leitura: ${errorMessage}`);
-      setIsReading(false);
-    }
-  }, [canUseNFC, unsupportedReason]);
-
-  /**
-   * Para a leitura de tags NFC
-   */
-  const stopReading = useCallback(async (): Promise<void> => {
-    if (ndefReader) {
-      try {
-        await ndefReader.stop();
-      } catch (err) {
-        // Erro silencioso ao parar NFC
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        // AbortError is expected, do nothing.
+      } else {
+        const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
+        console.error('Erro ao iniciar a varredura NFC:', err);
+        setError(`Erro ao iniciar a leitura: ${errorMessage}`);
+        setIsReading(false);
       }
     }
-    setIsReading(false);
-    setNdefReader(null);
-  }, [ndefReader]);
+  }, [canUseNFC, isReading, unsupportedReason, stopReading]);
 
-  /**
-   * Limpa os dados e erros armazenados
-   */
   const clear = useCallback((): void => {
     setData(null);
     setError(null);
