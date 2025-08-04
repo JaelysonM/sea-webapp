@@ -50,7 +50,7 @@ export const logout = createAction('LOGOUT');
 
 export const login = createAsyncThunk('LOGIN', async (data: FastAuth, { rejectWithValue }) => {
   try {
-    const request = await api.post<AuthenticationResponse>('qrcode/authenticate', data);
+    const request = await api.post<AuthenticationResponse>('qrcode/fast-auth/authenticate', data);
     return request.data;
   } catch (error) {
     return rejectWithValue((error as AxiosError).response?.data);
