@@ -25,9 +25,7 @@ const PlateScanner: React.FC<PlateScannerProps> = ({ onScan, onError }) => {
     <Container className='p-0 d-flex flex-column gap-3'>
       {canUseNFC && nfcIsReading ? (
         <>
-          <div
-            className={`${styles.nfcIndicator} d-flex align-items-center px-2 py-1 card-fade-in`}
-          >
+          <div className={`${styles.nfcIndicator} d-flex align-items-center px-2 py-1 card-fade`}>
             <div className={`${styles.nfcIcon} me-2`}>
               <i
                 className={`bi ${nfcIsReading ? 'bi-broadcast' : 'bi-broadcast-pin'}`}
@@ -42,7 +40,15 @@ const PlateScanner: React.FC<PlateScannerProps> = ({ onScan, onError }) => {
             </div>
           </div>
         </>
-      ) : null}
+      ) : (
+        <div
+          style={{
+            height: 30,
+          }}
+        />
+      )}
+
+      {/* QR Code Scanner Component */}
       <QRCodeScanner onScan={handleQRScan} onError={onError} />
     </Container>
   );
