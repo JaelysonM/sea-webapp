@@ -28,10 +28,10 @@ const ScaleSelectionModal: React.FC<ScaleSelectionModalProps> = ({
   const [selectedScaleId, setSelectedScaleId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (show && scales.length === 0) {
+    if (show) {
       fetchScales();
     }
-  }, [show, scales.length, fetchScales]);
+  }, [show, fetchScales]);
 
   useEffect(() => {
     if (show) {

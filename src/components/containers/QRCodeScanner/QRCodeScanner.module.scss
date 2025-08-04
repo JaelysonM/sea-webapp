@@ -1,4 +1,4 @@
-@import '~/helpers.scss';
+@use '~/helpers.scss';
 
 .pulse {
   animation: pulse 2s ease-in-out infinite;

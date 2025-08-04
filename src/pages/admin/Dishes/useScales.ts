@@ -19,6 +19,7 @@ const useScales = () => {
       request<Pageable<Scale>>({
         method: 'GET',
         url: '/scales',
+        params: { is_attached: false },
         onSuccess: (data) => {
           const scalesData = data.data;
           setScales(scalesData);
